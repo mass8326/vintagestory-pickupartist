@@ -1,0 +1,11 @@
+{
+  "type": "code",
+  "modid": "pickupartist",
+  "version": "0.1.0",
+  "name": "PickupArtist",
+  "description": "I pick things up and put them down",
+  "website": "https://github.com/mass8326/vintagestory-pickupartist",
+  "authors": ["Mass8326"],
+  "dependencies": { "game": "", "survival": "" },
+  "side": "universal"
+}
