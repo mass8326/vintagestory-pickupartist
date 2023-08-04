@@ -15,7 +15,6 @@
       "group": "build",
       "presentation": { "reveal": "silent" },
       "problemMatcher": "$msCompile",
-
       "type": "process",
       "command": "dotnet",
       "args": ["build", "-c", "release"]

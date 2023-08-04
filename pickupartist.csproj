@@ -5,7 +5,7 @@
 		<LangVersion>11</LangVersion>
 		<!-- Change this in case of overriding env var to test different version  -->
 		<VSPath>$(VINTAGE_STORY)</VSPath>
-		<ModVersion>0.1.0</ModVersion>
+		<ModVersion>0.1.1</ModVersion>
 	</PropertyGroup>
 	<!-- Links libraries -->
 	<ItemGroup>
@@ -29,17 +29,16 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-	<!-- Debug Task -->
+	<!-- Debug -->
 	<Target Name="Package" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'debug'">
-		<ZipDirectory DestinationFile="bin/debug/$(TargetName)-$(ModVersion).zip"
+		<ZipDirectory DestinationFile="bin/debug/$(TargetName)-debug-$(ModVersion).zip"
 			SourceDirectory="$(TargetDir)" Overwrite="true" />
 		<RemoveDir Directories="$(TargetDir)" />
 	</Target>
 	<!-- Release -->
-	<Target Name="PackageRelease" AfterTargets="PostBuildEvent"
-		Condition="'$(Configuration)' == 'release'">
+	<Target Name="PackageRelease" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'release'">
 		<ZipDirectory DestinationFile="bin/release/$(TargetName)-$(ModVersion).zip"
-			SourceDirectory="$(TargetDir)" Overwrite="false" />
+			SourceDirectory="$(TargetDir)" Overwrite="true" />
 		<RemoveDir Directories="$(TargetDir)" />
 	</Target>
 </Project>
