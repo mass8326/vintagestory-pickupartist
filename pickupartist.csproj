@@ -5,7 +5,7 @@
 		<LangVersion>11</LangVersion>
 		<!-- Change this in case of overriding env var to test different version  -->
 		<VSPath>$(VINTAGE_STORY)</VSPath>
-		<ModVersion>0.1.1</ModVersion>
+		<ModVersion>0.2.0</ModVersion>
 	</PropertyGroup>
 	<!-- Links libraries -->
 	<ItemGroup>
@@ -36,7 +36,8 @@
 		<RemoveDir Directories="$(TargetDir)" />
 	</Target>
 	<!-- Release -->
-	<Target Name="PackageRelease" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'release'">
+	<Target Name="PackageRelease" AfterTargets="PostBuildEvent"
+		Condition="'$(Configuration)' == 'release'">
 		<ZipDirectory DestinationFile="bin/release/$(TargetName)-$(ModVersion).zip"
 			SourceDirectory="$(TargetDir)" Overwrite="true" />
 		<RemoveDir Directories="$(TargetDir)" />
