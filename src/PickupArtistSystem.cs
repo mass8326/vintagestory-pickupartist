@@ -1,4 +1,5 @@
 using HarmonyLib;
+using System.Runtime.CompilerServices;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
@@ -7,11 +8,15 @@ namespace PickupArtist;
 
 public class PickupArtistSystem : ModSystem {
   public Harmony Harmony = new("pickupartist");
+
+  // Building in release configuration will break the mod without this
+  [MethodImpl(MethodImplOptions.NoOptimization)]
   public override void Start(ICoreAPI api) {
     base.Start(api);
     api.RegisterBlockBehaviorClass("RightClickPickup", typeof(BlockBehaviorRightClickPickup));
     Harmony.PatchAll();
   }
+
   public override void Dispose() {
     Harmony.UnpatchAll();
     base.Dispose();
