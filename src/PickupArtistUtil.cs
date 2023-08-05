@@ -14,19 +14,15 @@ public static class PickupArtistUtil {
   public static void TryGiveToPlayer(IWorldAccessor world, IPlayer player, BlockPos position, ItemStack[] stacks) {
     foreach (var stack in stacks) {
       var original = stack.Clone(); // TryPutInto modifies the stack
-      var sourceSlot = new DummySlot(stack);
-      var activeSlot = player.InventoryManager.ActiveHotbarSlot;
-      if (!CanMergeInto(world, activeSlot, stack)) {
-        var hotbar = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
-        foreach (var slot in hotbar) {
-          if (CanMergeInto(world, slot, stack)) sourceSlot.TryPutInto(world, slot, stack.StackSize);
-        }
+      DummySlot sourceSlot = new(stack);
+      List<ItemSlot> skipSlots = new(); // Helps prevent infinite loop
+      while (stack.StackSize > 0) {
+        ItemSlot destinationSlot = GetBestDestinationSlot(world, player, stack, skipSlots);
+        if (destinationSlot == null) break;
+        sourceSlot.TryPutInto(world, destinationSlot, stack.StackSize);
+        skipSlots.Add(destinationSlot);
       }
-      if (stack.StackSize > 0) sourceSlot.TryPutInto(world, activeSlot, stack.StackSize);
-      if (stack.StackSize > 0) { // If stack size is 0, it will make TryGiveItemstack return false
-        bool success = player.InventoryManager.TryGiveItemstack(stack, true);
-        if (!success) world.SpawnItemEntity(stack, position.ToVec3d().AddCopy(0.5, 0.1, 0.5));
-      }
+      if (stack.StackSize > 0) world.SpawnItemEntity(stack, position.ToVec3d().AddCopy(0.5, 0.1, 0.5));
       TreeAttribute tree = new();
       tree["itemstack"] = new ItemstackAttribute(original);
       tree["byentityid"] = new LongAttribute(player.Entity.EntityId);
@@ -34,30 +30,57 @@ public static class PickupArtistUtil {
     }
   }
 
-  public static ItemSlot GetBestMergableSlot(IWorldAccessor world, IPlayer player, ItemStack stack) {
-    var slot = player.InventoryManager.ActiveHotbarSlot;
-    var empty = slot.Empty;
-    var mergable = CanMergeInto(world, slot, stack);
-    if (empty || !mergable) {
-      var haystack = GetInventorySlots(player);
-      slot = FindSmallestMergableSlot(world, haystack, stack) ?? haystack.First((slot) => slot.Empty);
-    }
-    return slot;
+  /// <summary>
+  /// May return null
+  /// </summary>
+  public static ItemSlot GetBestDestinationSlot(IWorldAccessor world, IPlayer player, ItemStack stack, List<ItemSlot> skipSlots = null) {
+    skipSlots ??= new();
+
+    IInventory hotbar = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
+    ItemSlot destinationSlot = FindSmallestMergableSlot(world, hotbar, stack);
+    if (destinationSlot != null && !skipSlots.Contains(destinationSlot)) return destinationSlot;
+
+    destinationSlot = player.InventoryManager.ActiveHotbarSlot;
+    if (destinationSlot.Empty) return destinationSlot;
+    if (IsMergable(world, destinationSlot, stack) && !skipSlots.Contains(destinationSlot)) return destinationSlot;
+
+    IInventory backpack = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
+    destinationSlot = FindSmallestMergableSlot(world, backpack, stack);
+    if (destinationSlot != null && !skipSlots.Contains(destinationSlot)) return destinationSlot;
+
+    var haystack = backpack.Concat(hotbar);
+    return haystack
+      .Where(slot => slot.Empty && !skipSlots.Contains(slot))
+      .DefaultIfEmpty(null)
+      .First();
   }
 
+  /// <summary>
+  /// May return null
+  /// </summary>
+  public static ItemSlot GetBestSourceSlot(IWorldAccessor world, IPlayer player, ItemStack stack) {
+    ItemSlot activeSlot = player.InventoryManager.ActiveHotbarSlot;
+    if (IsMergable(world, activeSlot, stack)) return activeSlot;
+    IInventory backpack = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
+    IInventory hotbar = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
+    return
+      FindSmallestMergableSlot(world, backpack, stack) ??
+      FindSmallestMergableSlot(world, hotbar, stack);
+  }
+
+  /// <summary>
+  /// May return null
+  /// </summary>
   public static ItemSlot FindSmallestMergableSlot(IWorldAccessor world, IEnumerable<ItemSlot> slots, ItemStack stack) =>
     slots
-      .Where(slot => CanMergeInto(world, slot, stack))
+      .Where(slot => IsMergable(world, slot, stack))
       .OrderBy(slot => slot.StackSize)
-      .FirstOrDefault();
+      .DefaultIfEmpty(null)
+      .First();
 
-  public static bool CanMergeInto(IWorldAccessor world, ItemSlot slot, ItemStack stack) =>
+  /// <summary>
+  /// Note: an empty slot is not mergable
+  /// </summary>
+  public static bool IsMergable(IWorldAccessor world, ItemSlot slot, ItemStack stack) =>
     slot.Itemstack?.Equals(world, stack, GlobalConstants.IgnoredStackAttributes) == true;
-
-  public static IEnumerable<ItemSlot> GetInventorySlots(IPlayer player) {
-    var hotbar = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
-    var backpack = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
-    return hotbar.Concat(backpack);
-  }
 }
-

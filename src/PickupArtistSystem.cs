@@ -65,4 +65,3 @@ public class BlockBehaviorRightClickPickup : BlockBehavior {
     return true;
   }
 }
-

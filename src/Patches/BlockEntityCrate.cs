@@ -11,11 +11,10 @@ public static class BlockEntityCrate_OnBlockInteractStart_Patch {
     var world = __instance.Api.World;
     var pos = __instance.Pos;
 
-    bool put = byPlayer.Entity.Controls.ShiftKey;
-    bool take = !put;
     bool bulk = byPlayer.Entity.Controls.CtrlKey;
+    bool take = !byPlayer.Entity.Controls.ShiftKey;
 
-    bool drawIconLabel = put &&
+    bool drawIconLabel = !take &&
       byPlayer.InventoryManager.ActiveHotbarSlot?.Itemstack?.ItemAttributes?["pigment"]?["color"].Exists == true &&
       blockSel.SelectionBoxIndex == 1;
     if (drawIconLabel) return true;
@@ -24,38 +23,29 @@ public static class BlockEntityCrate_OnBlockInteractStart_Patch {
     var storageSlot = inventory.FirstNonEmptySlot;
     if (storageSlot == null) return true;
 
-    var playerSlot = PickupArtistUtil.GetBestMergableSlot(world, byPlayer, storageSlot.Itemstack);
-    if (take && storageSlot != null) {
+    __result = true;
+
+    if (take) {
       ItemStack stack = bulk ? storageSlot.TakeOutWhole() : storageSlot.TakeOut(1);
       PickupArtistUtil.TryGiveToPlayer(world, byPlayer, pos, stack);
       if (inventory.Empty) __instance.SetField("labelMesh", null);
       storageSlot.MarkDirty();
-      __instance.MarkDirty();
-    }
-
-    if (put && !playerSlot.Empty) {
-      if (storageSlot == null) {
-        var moved = playerSlot.TryPutInto(world, inventory[0], bulk ? playerSlot.StackSize : 1);
-        if (moved > 0) __instance.CallMethod("didMoveItems", new object[] { inventory[0].Itemstack, byPlayer });
-      } else {
-        var mergable = PickupArtistUtil.CanMergeInto(world, playerSlot, storageSlot.Itemstack);
-        if (mergable) {
-          List<ItemSlot> skipSlots = new();
-          while (playerSlot.StackSize > 0 && skipSlots.Count < inventory.Count) {
-            var wslot = inventory.GetBestSuitedSlot(playerSlot, skipSlots);
-            if (wslot.slot == null) break;
-            if (playerSlot.TryPutInto(world, wslot.slot, bulk ? playerSlot.StackSize : 1) > 0) {
-              __instance.CallMethod("didMoveItems", new object[] { wslot.slot.Itemstack, byPlayer });
-              if (!bulk) break;
-            }
-            skipSlots.Add(wslot.slot);
-          }
+    } else {
+      var playerSlot = PickupArtistUtil.GetBestSourceSlot(world, byPlayer, storageSlot.Itemstack);
+      if (playerSlot == null) return false;
+      List<ItemSlot> skipSlots = new();
+      while (playerSlot.StackSize > 0 && skipSlots.Count < inventory.Count) {
+        var wslot = inventory.GetBestSuitedSlot(playerSlot, skipSlots);
+        if (wslot.slot == null) break;
+        if (playerSlot.TryPutInto(world, wslot.slot, bulk ? playerSlot.StackSize : 1) > 0) {
+          __instance.CallMethod("didMoveItems", new object[] { wslot.slot.Itemstack, byPlayer });
+          if (!bulk) break;
         }
+        skipSlots.Add(wslot.slot);
       }
       playerSlot.MarkDirty();
-      __instance.MarkDirty();
     }
-    __result = true;
+      __instance.MarkDirty();
     return false;
   }
 }

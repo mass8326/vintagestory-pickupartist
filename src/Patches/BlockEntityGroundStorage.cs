@@ -26,8 +26,10 @@ public static class BlockEntityGroundStorage_OnPlayerInteractStart_Patch {
     BlockEntity aboveEntity = __instance.Api.World.BlockAccessor.GetBlockEntity(abovePos);
     if (aboveEntity is BlockEntityGroundStorage) return true;
 
+    var sourceSlot = PickupArtistUtil.GetBestSourceSlot(world, player, storageSlot.Itemstack);
+    if (sourceSlot == null) return true;
+
     bool sneaking = player.Entity.Controls.ShiftKey;
-    var sourceSlot = PickupArtistUtil.GetBestMergableSlot(world, player, storageSlot.Itemstack);
     if (sneaking && sourceSlot.Empty) return true;
 
     if (sneaking && __instance.TotalStackSize >= __instance.Capacity) return true;
@@ -58,7 +60,8 @@ public static class BlockEntityGroundStorage_TryPutItem_Patch {
     if (storageSlot.Empty) return true;
 
     var world = __instance.Api.World;
-    var sourceSlot = PickupArtistUtil.GetBestMergableSlot(world, player, storageSlot.Itemstack);
+    var sourceSlot = PickupArtistUtil.GetBestSourceSlot(world, player, storageSlot.Itemstack);
+    if (sourceSlot == null) return true;
 
     bool sprinting = player.Entity.Controls.CtrlKey;
     int transfer = sprinting ? __instance.BulkTransferQuantity : __instance.TransferQuantity;
@@ -106,7 +109,6 @@ public static class BlockEntityGroundStorage_TryTakeItem_Patch {
     bool sprinting = player.Entity.Controls.CtrlKey;
     int transfer = sprinting ? __instance.BulkTransferQuantity : __instance.TransferQuantity;
     int quantity = GameMath.Min(transfer, __instance.TotalStackSize);
-    __instance.Api.Logger.Debug("Quantity " + quantity);
 
     var world = __instance.Api.World;
     var pos = __instance.Pos;
