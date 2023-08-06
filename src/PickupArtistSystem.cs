@@ -45,7 +45,7 @@ public class BlockBehaviorRightClickPickup : BlockBehavior {
     if (player.Entity.Controls.ShiftKey || !world.Claims.TryAccess(player, selection.Position, EnumBlockAccessFlags.BuildOrBreak))
       return false;
 
-    // Not sure why this default value in the original code -- including just in case
+    // This default value is needed for lamps, buckets, etc
     ItemStack[] dropStacks = new ItemStack[] { block.OnPickBlock(world, selection.Position) };
     if (BlockIsPickupable) {
       float dropMultiplier =

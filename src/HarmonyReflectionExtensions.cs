@@ -1,4 +1,3 @@
-
 // https://github.com/Craluminum-Mods/ExtraInfo/blob/96c4343/src/HarmonyPatches.cs
 // 
 // MIT License

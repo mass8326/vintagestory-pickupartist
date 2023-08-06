@@ -1,20 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<!-- Sets variables -->
 	<PropertyGroup>
 		<TargetFramework>net462</TargetFramework>
 		<LangVersion>11</LangVersion>
-		<!-- Change this in case of overriding env var to test different version  -->
 		<VSPath>$(VINTAGE_STORY)</VSPath>
 		<ModVersion>0.2.0</ModVersion>
 	</PropertyGroup>
-	<!-- Links libraries -->
 	<ItemGroup>
 		<Reference Include="VintagestoryAPI">
-			<HintPath>$(VSPath)/VintagestoryAPI.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="VSSurvivalMod">
-			<HintPath>$(VSPath)/Mods/VSSurvivalMod.dll</HintPath>
+			<HintPath>$(VINTAGE_STORY)/Mods/VSSurvivalMod.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="0Harmony">
@@ -22,20 +19,17 @@
 			<Private>false</Private>
 		</Reference>
 	</ItemGroup>
-	<!-- Common -->
 	<ItemGroup>
 		<None Include="resources/**">
 			<Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-	<!-- Debug -->
 	<Target Name="Package" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'debug'">
 		<ZipDirectory DestinationFile="bin/debug/$(TargetName)-debug-$(ModVersion).zip"
 			SourceDirectory="$(TargetDir)" Overwrite="true" />
 		<RemoveDir Directories="$(TargetDir)" />
 	</Target>
-	<!-- Release -->
 	<Target Name="PackageRelease" AfterTargets="PostBuildEvent"
 		Condition="'$(Configuration)' == 'release'">
 		<ZipDirectory DestinationFile="bin/release/$(TargetName)-$(ModVersion).zip"
