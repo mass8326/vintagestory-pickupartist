@@ -41,7 +41,7 @@ public class BlockBehaviorRightClickPickup : BlockBehavior {
   }
 
   public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer player, BlockSelection selection, ref EnumHandling handling) {
-    handling = EnumHandling.PreventSubsequent;
+    handling = EnumHandling.PreventDefault;
     if (player.Entity.Controls.ShiftKey || !world.Claims.TryAccess(player, selection.Position, EnumBlockAccessFlags.BuildOrBreak))
       return false;
 
