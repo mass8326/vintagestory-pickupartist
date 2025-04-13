@@ -9,10 +9,10 @@ using Vintagestory.GameContent;
 namespace PickupArtist;
 
 public static class PickupArtistUtil {
-  public static void TryGiveToPlayer(IWorldAccessor world, IPlayer player, BlockPos position, ItemStack stack) {
-    TryGiveToPlayer(world, player, position, new ItemStack[] { stack });
+  public static void GiveToPlayer(IWorldAccessor world, IPlayer player, BlockPos position, ItemStack stack) {
+    GiveToPlayer(world, player, position, new ItemStack[] { stack });
   }
-  public static void TryGiveToPlayer(IWorldAccessor world, IPlayer player, BlockPos position, ItemStack[] stacks) {
+  public static void GiveToPlayer(IWorldAccessor world, IPlayer player, BlockPos position, ItemStack[] stacks) {
     foreach (var stack in stacks) {
       var original = stack.Clone(); // TryPutInto modifies the stack
       DummySlot sourceSlot = new DummySlot(stack);

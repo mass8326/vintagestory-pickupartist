@@ -57,7 +57,7 @@ public class BlockBehaviorRightClickPickup : BlockBehavior {
     if (dropStacks.Length == 0) return false;
 
     if (world.Side == EnumAppSide.Server && BlockBehaviorReinforcable.AllowRightClickPickup(world, selection.Position, player)) {
-      PickupArtistUtil.TryGiveToPlayer(world, player, selection.Position, dropStacks);
+      PickupArtistUtil.GiveToPlayer(world, player, selection.Position, dropStacks);
       world.BlockAccessor.SetBlock(0, selection.Position);
       world.BlockAccessor.TriggerNeighbourBlockUpdate(selection.Position);
       world.PlaySoundAt(SoundEffectLocation ?? block.GetSounds(world.BlockAccessor, selection).Place, player, null);

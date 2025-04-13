@@ -28,7 +28,7 @@ public static class BlockEntityCrate_OnBlockInteractStart_Patch {
 
     if (take) {
       ItemStack stack = bulk ? storageSlot.TakeOutWhole() : storageSlot.TakeOut(1);
-      PickupArtistUtil.TryGiveToPlayer(world, byPlayer, pos, stack);
+      PickupArtistUtil.GiveToPlayer(world, byPlayer, pos, stack);
       __instance.CallMethod("didMoveItems", new object[] { stack, byPlayer });
       if (inventory.Empty) __instance.SetField("labelMesh", null);
       storageSlot.MarkDirty();

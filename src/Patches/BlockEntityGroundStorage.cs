@@ -178,7 +178,7 @@ public static class BlockEntityGroundStorage_TryTakeItem_Patch {
     var world = __instance.Api.World;
     var pos = __instance.Pos;
     ItemStack stack = storageSlot.TakeOut(quantity);
-    PickupArtistUtil.TryGiveToPlayer(world, player, pos, stack);
+    PickupArtistUtil.GiveToPlayer(world, player, pos, stack);
 
     if (__instance.TotalStackSize == 0) __instance.Api.World.BlockAccessor.SetBlock(0, pos);
 
@@ -188,6 +188,34 @@ public static class BlockEntityGroundStorage_TryTakeItem_Patch {
 
     (player as IClientPlayer)?.TriggerFpAnimation(EnumHandInteract.HeldItemInteract);
 
+    __result = true;
+    return false;
+  }
+}
+
+[HarmonyPatch(typeof(BlockEntityGroundStorage), nameof(BlockEntityGroundStorage.putOrGetItemSingle))]
+public static class BlockEntityGroundStorage_putOrGetItemSingle_Patch {
+  public static bool Prefix(BlockEntityGroundStorage __instance, ref bool __result, ItemSlot ourSlot, IPlayer player, BlockSelection bs) {
+    IWorldAccessor world = __instance.Api.World;
+    BlockPos pos = __instance.Pos;
+
+    if (ourSlot.Empty) {
+      world.Logger.PickupDebug("Ignoring put/get item single due to storage being empty");
+      return true;
+    }
+
+    if (ourSlot.Itemstack.Collectible is IContainedInteractable containedInteractable && containedInteractable.OnContainedInteractStart(__instance, ourSlot, player, bs)) {
+      world.Logger.PickupDebug("Contained interactable handled put/get item single");
+      BlockGroundStorage.IsUsingContainedBlock = true;
+      __instance.SetField("isUsingSlot", ourSlot);
+      __result = true;
+      return false;
+    }
+
+    PickupArtistUtil.GiveToPlayer(world, player, pos, ourSlot.Itemstack);
+    world.PlaySoundAt(__instance.StorageProps.PlaceRemoveSound, pos.X + 0.5, pos.InternalY, pos.Z + 0.5, player, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16f);
+    ourSlot.Itemstack = null;
+    ourSlot.MarkDirty();
     __result = true;
     return false;
   }

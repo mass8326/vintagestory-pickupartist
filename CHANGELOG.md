@@ -4,6 +4,7 @@
 
 - Update mod to support game version 1.20.7
   - Fix piles no longer stacking higher than one block
+- Add modification of take behavior from pots, crocks, bowls, wall-leaning tools, etc
 
 ## 0.2.0
 
