@@ -1,6 +1,6 @@
 # PickupArtist
 
-## Unreleased
+## 0.3.0
 
 - Update mod to support game version 1.20.7
   - Fix piles no longer stacking higher than one block
