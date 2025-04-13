@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Launch Client (Debug)",
-      "type": "clr",
+      "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "Build (Debug)",
       "program": "${env:VINTAGE_STORY}/Vintagestory.exe",
@@ -20,7 +20,7 @@
     },
     {
       "name": "Launch Client (Release)",
-      "type": "clr",
+      "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "Build (Release)",
       "program": "${env:VINTAGE_STORY}/Vintagestory.exe",

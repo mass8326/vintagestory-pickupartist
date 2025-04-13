@@ -27,7 +27,7 @@ using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 
-namespace PickupArtist.Patches;
+namespace PickupArtist;
 
 public static class HarmonyReflectionExtensions {
   #region Fields
@@ -39,8 +39,8 @@ public static class HarmonyReflectionExtensions {
   /// <param name="instance">The instance in which the field resides.</param>
   /// <param name="fieldName">The name of the field to return.</param>
   /// <returns>An object containing the value of the field, reflected by this instance.</returns>
-  public static T GetField<T>(this object instance, string fieldName) {
-    return (T)AccessTools.Field(instance.GetType(), fieldName).GetValue(instance);
+  public static T? GetField<T>(this object instance, string fieldName) {
+    return (T?)AccessTools.Field(instance.GetType(), fieldName).GetValue(instance);
   }
 
   /// <summary>
@@ -49,7 +49,7 @@ public static class HarmonyReflectionExtensions {
   /// <typeparam name="T">The type of field to return.</typeparam>
   /// <param name="instance">The instance in which the field resides.</param>
   /// <returns>An array containing the values of the fields of a specified Type, reflected by this instance.</returns>
-  public static T[] GetFields<T>(this object instance) {
+  public static T?[]? GetFields<T>(this object instance) {
     var declaredFields =
         AccessTools.GetDeclaredFields(instance.GetType())?.Where(t => t.FieldType == typeof(T));
     return declaredFields?.Select(val => instance.GetField<T>(val.Name)).ToArray();
@@ -61,7 +61,7 @@ public static class HarmonyReflectionExtensions {
   /// <param name="instance">The instance in which the field resides.</param>
   /// <param name="fieldName">The name of the field to set.</param>
   /// <param name="setVal">The value to set the field to.</param>
-  public static void SetField(this object instance, string fieldName, object setVal) {
+  public static void SetField(this object instance, string fieldName, object? setVal) {
     AccessTools.Field(instance.GetType(), fieldName).SetValue(instance, setVal);
   }
 
@@ -77,7 +77,11 @@ public static class HarmonyReflectionExtensions {
   /// <param name="propertyName">The name of the property to return.</param>
   /// <returns>An object containing the value of the property, reflected by this instance.</returns>
   public static T GetProperty<T>(this object instance, string propertyName) {
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8603 // Possible null reference return.
     return (T)AccessTools.Property(instance.GetType(), propertyName).GetValue(instance);
+#pragma warning restore CS8603 // Possible null reference return.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
   }
 
   /// <summary>
@@ -98,7 +102,11 @@ public static class HarmonyReflectionExtensions {
   /// <param name="propertyName">The name of the property to return.</param>
   /// <returns>An object containing the value of the property, reflected by this instance.</returns>
   public static T GetStaticProperty<T>(this Type type, string propertyName) {
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8603 // Possible null reference return.
     return (T)AccessTools.Property(type, propertyName).GetValue(null);
+#pragma warning restore CS8603 // Possible null reference return.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
   }
 
   /// <summary>
@@ -124,7 +132,11 @@ public static class HarmonyReflectionExtensions {
   /// <param name="args">The arguments to pass to the method.</param>
   /// <returns>The return value of the reflected method call.</returns>
   public static T CallMethod<T>(this object instance, string method, params object[] args) {
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8603 // Possible null reference return.
     return (T)AccessTools.Method(instance.GetType(), method).Invoke(instance, args);
+#pragma warning restore CS8603 // Possible null reference return.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
   }
 
   /// <summary>
@@ -172,7 +184,7 @@ public static class HarmonyReflectionExtensions {
   /// <param name="parameters">An itemised method signature, used to distinguish between overloads.</param>
   /// <param name="generics">An itemised array of generic parameters, used to distinguish between overloads.</param>
   /// <returns>Returns a <see cref="MethodInfo"/> for the specified method.</returns>
-  public static MethodInfo GetMethod(this object instance, string method, Type[] parameters = null, Type[] generics = null) {
+  public static MethodInfo GetMethod(this object instance, string method, Type[]? parameters = null, Type[]? generics = null) {
     return AccessTools.Method(instance.GetType(), method, parameters, generics);
   }
 
@@ -197,7 +209,9 @@ public static class HarmonyReflectionExtensions {
   /// <returns>The <see cref="Type"/> of the class, if found within the assembly, otherwise, returns <c>null</c>.</returns>
   public static Type GetClassType(this Assembly assembly, string className) {
     var ts = AccessTools.GetTypesFromAssembly(assembly);
+#pragma warning disable CS8603 // Possible null reference return.
     return Array.Find(ts, t => t.Name == className);
+#pragma warning restore CS8603 // Possible null reference return.
   }
 
   #endregion

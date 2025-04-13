@@ -1,5 +1,5 @@
-using HarmonyLib;
 using System.Runtime.CompilerServices;
+using HarmonyLib;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
@@ -25,7 +25,7 @@ public class PickupArtistSystem : ModSystem {
 
 public class BlockBehaviorRightClickPickup : BlockBehavior {
   bool BlockIsPickupable;
-  AssetLocation SoundEffectLocation;
+  AssetLocation? SoundEffectLocation;
 
   public BlockBehaviorRightClickPickup(Block block) : base(block) { }
 
@@ -34,7 +34,7 @@ public class BlockBehaviorRightClickPickup : BlockBehavior {
 
     BlockIsPickupable = properties["dropsPickupMode"].AsBool(false);
 
-    string soundProperty =
+    string? soundProperty =
       properties["sound"].AsString() ??
       block.Attributes?["placeSound"].AsString();
     if (soundProperty != null) SoundEffectLocation = AssetLocation.Create(soundProperty, block.Code.Domain);
@@ -60,7 +60,7 @@ public class BlockBehaviorRightClickPickup : BlockBehavior {
       PickupArtistUtil.TryGiveToPlayer(world, player, selection.Position, dropStacks);
       world.BlockAccessor.SetBlock(0, selection.Position);
       world.BlockAccessor.TriggerNeighbourBlockUpdate(selection.Position);
-      world.PlaySoundAt(SoundEffectLocation ?? block.GetSounds(world.BlockAccessor, selection.Position).Place, player, null);
+      world.PlaySoundAt(SoundEffectLocation ?? block.GetSounds(world.BlockAccessor, selection).Place, player, null);
     }
     return true;
   }

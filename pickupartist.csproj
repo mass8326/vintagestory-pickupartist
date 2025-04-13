@@ -1,9 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net462</TargetFramework>
+		<TargetFramework>net7.0-windows</TargetFramework>
+		<TargetGameVersion>1.20.7</TargetGameVersion>
 		<LangVersion>11</LangVersion>
 		<VSPath>$(VINTAGE_STORY)</VSPath>
 		<ModVersion>0.2.0</ModVersion>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
 		<Reference Include="VintagestoryAPI">

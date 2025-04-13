@@ -19,7 +19,8 @@ public static class BlockEntityCrate_OnBlockInteractStart_Patch {
       blockSel.SelectionBoxIndex == 1;
     if (drawIconLabel) return true;
 
-    var inventory = __instance.GetField<InventoryGeneric>("inventory");
+    InventoryGeneric? inventory = __instance.GetField<InventoryGeneric>("inventory");
+    if (inventory == null) return true;
     var storageSlot = inventory.FirstNonEmptySlot;
     if (storageSlot == null) return true;
 
@@ -36,7 +37,7 @@ public static class BlockEntityCrate_OnBlockInteractStart_Patch {
       if (playerSlot == null) return false;
       List<ItemSlot> skipSlots = new();
       while (playerSlot.StackSize > 0 && skipSlots.Count < inventory.Count) {
-        var wslot = inventory.GetBestSuitedSlot(playerSlot, skipSlots);
+        var wslot = inventory.GetBestSuitedSlot(playerSlot, null, skipSlots);
         if (wslot.slot == null) break;
         if (playerSlot.TryPutInto(world, wslot.slot, bulk ? playerSlot.StackSize : 1) > 0) {
           __instance.CallMethod("didMoveItems", new object[] { wslot.slot.Itemstack, byPlayer });
@@ -46,7 +47,7 @@ public static class BlockEntityCrate_OnBlockInteractStart_Patch {
       }
       playerSlot.MarkDirty();
     }
-      __instance.MarkDirty();
+    __instance.MarkDirty();
     return false;
   }
 }

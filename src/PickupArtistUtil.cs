@@ -4,6 +4,7 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
+using Vintagestory.GameContent;
 
 namespace PickupArtist;
 
@@ -14,30 +15,27 @@ public static class PickupArtistUtil {
   public static void TryGiveToPlayer(IWorldAccessor world, IPlayer player, BlockPos position, ItemStack[] stacks) {
     foreach (var stack in stacks) {
       var original = stack.Clone(); // TryPutInto modifies the stack
-      DummySlot sourceSlot = new(stack);
-      List<ItemSlot> skipSlots = new(); // Helps prevent infinite loop
+      DummySlot sourceSlot = new DummySlot(stack);
+      List<ItemSlot> skipSlots = new List<ItemSlot>(); // Helps prevent infinite loop
       while (stack.StackSize > 0) {
-        ItemSlot destinationSlot = GetBestDestinationSlot(world, player, stack, skipSlots);
+        ItemSlot? destinationSlot = GetBestDestinationSlot(world, player, stack, skipSlots);
         if (destinationSlot == null) break;
         sourceSlot.TryPutInto(world, destinationSlot, stack.StackSize);
         skipSlots.Add(destinationSlot);
       }
       if (stack.StackSize > 0) world.SpawnItemEntity(stack, position.ToVec3d().AddCopy(0.5, 0.1, 0.5));
-      TreeAttribute tree = new();
+      TreeAttribute tree = new TreeAttribute();
       tree["itemstack"] = new ItemstackAttribute(original);
       tree["byentityid"] = new LongAttribute(player.Entity.EntityId);
       world.Api.Event.PushEvent("onitemcollected", tree);
     }
   }
 
-  /// <summary>
-  /// May return null
-  /// </summary>
-  public static ItemSlot GetBestDestinationSlot(IWorldAccessor world, IPlayer player, ItemStack stack, List<ItemSlot> skipSlots = null) {
+  public static ItemSlot? GetBestDestinationSlot(IWorldAccessor world, IPlayer player, ItemStack stack, List<ItemSlot>? skipSlots = null) {
     skipSlots ??= new();
 
     IInventory hotbar = player.InventoryManager.GetOwnInventory(GlobalConstants.hotBarInvClassName);
-    ItemSlot destinationSlot = FindSmallestMergableSlot(world, hotbar, stack);
+    ItemSlot? destinationSlot = FindSmallestMergableSlot(world, hotbar, stack);
     if (destinationSlot != null && !skipSlots.Contains(destinationSlot)) return destinationSlot;
 
     destinationSlot = player.InventoryManager.ActiveHotbarSlot;
@@ -55,10 +53,20 @@ public static class PickupArtistUtil {
       .First();
   }
 
-  /// <summary>
-  /// May return null
-  /// </summary>
-  public static ItemSlot GetBestSourceSlot(IWorldAccessor world, IPlayer player, ItemStack stack) {
+  public static ItemSlot? GetBestSourceSlotForPile(BlockEntityGroundStorage pile, IPlayer player) {
+    ItemSlot? storageSlot = pile.GetField<InventoryGeneric>("inventory")?[0];
+    if (storageSlot?.Empty != false) {
+      BlockPos belowPos = pile.Pos.DownCopy();
+      BlockEntity belowEntity = pile.Api.World.BlockAccessor.GetBlockEntity(belowPos);
+      if (belowEntity is BlockEntityGroundStorage belowStorage) {
+        storageSlot = belowStorage.GetField<InventoryGeneric>("inventory")?[0];
+      }
+    }
+    if (storageSlot == null) return null;
+    return GetBestSourceSlot(pile.Api.World, player, storageSlot.Itemstack);
+  }
+
+  public static ItemSlot? GetBestSourceSlot(IWorldAccessor world, IPlayer player, ItemStack stack) {
     ItemSlot activeSlot = player.InventoryManager.ActiveHotbarSlot;
     if (IsMergable(world, activeSlot, stack)) return activeSlot;
     IInventory backpack = player.InventoryManager.GetOwnInventory(GlobalConstants.backpackInvClassName);
@@ -68,10 +76,7 @@ public static class PickupArtistUtil {
       FindSmallestMergableSlot(world, hotbar, stack);
   }
 
-  /// <summary>
-  /// May return null
-  /// </summary>
-  public static ItemSlot FindSmallestMergableSlot(IWorldAccessor world, IEnumerable<ItemSlot> slots, ItemStack stack) =>
+  public static ItemSlot? FindSmallestMergableSlot(IWorldAccessor world, IEnumerable<ItemSlot> slots, ItemStack stack) =>
     slots
       .Where(slot => IsMergable(world, slot, stack))
       .OrderBy(slot => slot.StackSize)
@@ -83,4 +88,10 @@ public static class PickupArtistUtil {
   /// </summary>
   public static bool IsMergable(IWorldAccessor world, ItemSlot slot, ItemStack stack) =>
     slot.Itemstack?.Equals(world, stack, GlobalConstants.IgnoredStackAttributes) == true;
+
+  public static void PickupDebug(this ILogger logger, string msg) =>
+    logger.Debug("[PickupArtist] " + msg);
+
+  public static void PickupDebug(this ILogger logger, string format, params object?[] args) =>
+    logger.Debug("[PickupArtist] " + format, args);
 }
