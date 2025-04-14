@@ -1,5 +1,9 @@
 # PickupArtist
 
+## Unreleased
+
+- Fix ingot piles not properly stacking
+
 ## 0.3.0
 
 - Update mod to support game version 1.20.7

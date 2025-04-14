@@ -145,12 +145,26 @@ public static class BlockEntityGroundStorage_TryPutItem_Patch {
     bool sprinting = player.Entity.Controls.CtrlKey;
     int transfer = sprinting ? __instance.BulkTransferQuantity : __instance.TransferQuantity;
     int remaining = __instance.Capacity - __instance.TotalStackSize;
-    int qty = GameMath.Min(sourceSlot.StackSize, transfer, remaining);
-    int moved = sourceSlot.TryPutInto(world, storageSlot, qty);
-    if (moved > 0) {
-      AssetLocation sound = __instance.StorageProps.PlaceRemoveSound.WithPathPrefixOnce("sounds/");
-      world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
+    int addQty = GameMath.Min(sourceSlot.StackSize, transfer, remaining);
+
+    // Add to the pile and average item temperatures
+    // Do not use `sourceSlot.TryPutInto` because it breaks ingot piles for some reason
+    // Probably due to some merge attribute checks failing
+    if (storageSlot.Itemstack != null && storageSlot.Itemstack.StackSize > 0) {
+      int oldSize = storageSlot.Itemstack.StackSize;
+      float oldTemp = storageSlot.Itemstack.Collectible.GetTemperature(world, storageSlot.Itemstack);
+      float addTemp = sourceSlot.Itemstack.Collectible.GetTemperature(world, sourceSlot.Itemstack);
+      storageSlot.Itemstack.StackSize += addQty;
+      storageSlot.Itemstack.Collectible.SetTemperature(world, storageSlot.Itemstack, (oldTemp * oldSize + addTemp * addQty) / storageSlot.Itemstack.StackSize, false);
+    } else {
+      storageSlot.Itemstack = sourceSlot.Itemstack.GetEmptyClone();
+      storageSlot.Itemstack.StackSize = addQty;
     }
+    sourceSlot.TakeOut(addQty);
+    sourceSlot.OnItemSlotModified(null);
+    AssetLocation sound = __instance.StorageProps.PlaceRemoveSound.WithPathPrefixOnce("sounds/");
+    world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
+
     __instance.MarkDirty();
 
     Cuboidf[] collBoxes = world.BlockAccessor.GetBlock(pos).GetCollisionBoxes(world.BlockAccessor, pos);
