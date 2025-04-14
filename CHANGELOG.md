@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fix ingot piles not properly stacking
+- Remove debug logging on release build
 
 ## 0.3.0
 

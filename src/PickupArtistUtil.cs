@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
@@ -89,9 +90,11 @@ public static class PickupArtistUtil {
   public static bool IsMergable(IWorldAccessor world, ItemSlot slot, ItemStack stack) =>
     slot.Itemstack?.Equals(world, stack, GlobalConstants.IgnoredStackAttributes) == true;
 
+  [Conditional("DEBUG")]
   public static void PickupDebug(this ILogger logger, string msg) =>
     logger.Debug("[PickupArtist] " + msg);
 
+  [Conditional("DEBUG")]
   public static void PickupDebug(this ILogger logger, string format, params object?[] args) =>
     logger.Debug("[PickupArtist] " + format, args);
 }
