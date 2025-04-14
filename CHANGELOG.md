@@ -1,6 +1,6 @@
 # PickupArtist
 
-## Unreleased
+## 0.3.1
 
 - Fix ingot piles not properly stacking
 - Remove debug logging on release build
