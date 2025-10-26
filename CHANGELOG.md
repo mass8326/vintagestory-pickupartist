@@ -1,5 +1,10 @@
 # PickupArtist
 
+## 0.3.2
+
+- Update mod to support game version 1.21.5
+- Fix NullReferenceException when playing sounds for ground storage piles
+
 ## 0.3.1
 
 - Fix ingot piles not properly stacking
