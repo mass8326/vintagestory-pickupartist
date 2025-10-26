@@ -1,11 +1,11 @@
 {
   "type": "code",
-  "modid": "sparkspickupartist",
+  "modid": "pickupartist",
   "version": "0.3.2",
-  "name": "Sparks' PickupArtist",
+  "name": "PickupArtist",
   "description": "I pick things up and put them down",
   "website": "https://github.com/mass8326/vintagestory-pickupartist",
-  "authors": ["Mass8326", "SparksSkywere"],
+  "authors": ["Mass8326"],
   "dependencies": { "game": "", "survival": "" },
   "side": "universal"
 }
