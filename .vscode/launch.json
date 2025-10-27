@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Client (Debug)",
+      "name": "Launch Windows (Debug)",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "Build (Debug)",
@@ -19,11 +19,45 @@
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Launch Client (Release)",
+      "name": "Launch Windows (Release)",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "Build (Release)",
       "program": "${env:VINTAGE_STORY}/Vintagestory.exe",
+      "args": [
+        "--playStyle",
+        "preset-surviveandbuild",
+        "--openWorld",
+        "modding test world",
+        "--addModPath",
+        "${workspaceFolder}/bin/release"
+      ],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Launch Linux (Debug)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build (Debug)",
+      "program": "${env:VINTAGE_STORY}/Vintagestory",
+      "args": [
+        "--playStyle",
+        "preset-surviveandbuild",
+        "--openWorld",
+        "modding test world",
+        "--addModPath",
+        "${workspaceFolder}/bin/debug"
+      ],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Launch Linux (Release)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build (Release)",
+      "program": "${env:VINTAGE_STORY}/Vintagestory",
       "args": [
         "--playStyle",
         "preset-surviveandbuild",

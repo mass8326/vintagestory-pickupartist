@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net8.0-windows</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<TargetGameVersion>1.21.5</TargetGameVersion>
 		<LangVersion>11</LangVersion>
 		<VSPath>$(VINTAGE_STORY)</VSPath>
@@ -28,13 +28,13 @@
 		</None>
 	</ItemGroup>
 	<Target Name="Package" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'debug'">
-		<ZipDirectory DestinationFile="bin/debug/$(TargetName)-debug-$(ModVersion).zip"
+		<ZipDirectory DestinationFile="bin/Debug/$(TargetName)-debug-$(ModVersion).zip"
 			SourceDirectory="$(TargetDir)" Overwrite="true" />
 		<RemoveDir Directories="$(TargetDir)" />
 	</Target>
 	<Target Name="PackageRelease" AfterTargets="PostBuildEvent"
 		Condition="'$(Configuration)' == 'release'">
-		<ZipDirectory DestinationFile="bin/release/$(TargetName)-$(ModVersion).zip"
+		<ZipDirectory DestinationFile="bin/Release/$(TargetName)-$(ModVersion).zip"
 			SourceDirectory="$(TargetDir)" Overwrite="true" />
 		<RemoveDir Directories="$(TargetDir)" />
 	</Target>

@@ -5,6 +5,9 @@ Picking things up and putting them down is now much more convenient!
 - You can add to and remove from piles and crates without the relevant item being in your active hotbar slot
 - You no longer need an empty hand to pick rocks and sticks up from the ground
 
+> [!NOTE]
+> I haven't had much time to keep up this mod up to date with every game update. Please feel free to make a fork or open a pull request if you want to take a stab at the code yourself!
+
 ## Less Hotbar Management
 
 I've also made tweaks to how items are transferred to and from your inventory. This is an attempt to reduce the amount of hotbar management you need to do.
@@ -27,30 +30,36 @@ For reference, vanilla will fill your hotbar left-to-right first.
 
 Don't have control of the server? Want even more convenience when it comes to managing your inventory? Try my client-side only inventory mod: [NoHands](https://github.com/mass8326/vintagestory-nohands)
 
+### Known Issues
+
+- Client and server desyncs where item counts are inaccurate
+- Some piles should not be stackable across multiple vertical blocks (sticks, stones)
+
 ## Technical Info
 
-This mod is required on both the server and client to work properly. Should work fine with any .net 7 build.
-
-Fully compatible with:
-
-- [Auto Map Markers](https://mods.vintagestory.at/show/mod/797) - Picking up ores will now trigger automatic marker creation (PickupArtist v0.2.0+)
-
-Partially compatible with:
+### Partial Compatibility
 
 - [Carry On](https://mods.vintagestory.at/carryon) - Carrying a crate takes priority over placing items into it when both hands are empty
 
-Incompatible with:
+### Known Conflicts
 
-- [Crateful](https://mods.vintagestory.at/crateful) - I love Crateful and used it a ton before making this mod! PickupArtist offers tweaked take (not just put) behavior and aims to reduce hotbar management as well.
+- [Crateful](https://mods.vintagestory.at/crateful) - Pickup Artist should offer the similar capabilities
+
+### Reported Conflicts
+
+- [Fix Crate](https://github.com/mass8326/vintagestory-pickupartist/issues/5) - Both mods attempt to patch the same code
+- [MorePiles](https://github.com/mass8326/vintagestory-pickupartist/issues/6) - Crashes occur during some edge cases
 - [Primitive Survival](https://github.com/mass8326/vintagestory-pickupartist/issues/1) - Fishing line and other interactions seem to be broken
+- [Salty's Manual Scraping](https://github.com/mass8326/vintagestory-pickupartist/issues/4) - Pickup conflicts with using a knife
 
-Future plans:
-
-- Apply the tweaked behavior to tool racks ~~and non-pile ground storages~~
-- Faster adding of grass, sticks, and fuel to pit kilns
-
-This has been my most complicated work in C# so far. Please let me know if you run into any bugs by creating an issue.
+## Acknowledgements
 
 Many thanks to DanaCraluminum! They've made a ton of great mods and have provided them under an open source license. I've used one of their utilities from [ExtraInfo](https://github.com/Craluminum-Mods/ExtraInfo) to make this.
 
 Thanks to [SalieriC](https://github.com/mass8326/vintagestory-nohands/issues/1) as well for giving me the gentle nudge to make this mod.
+
+## Contributing
+
+This repository is set up to easily launch and debug in [VSCode](https://code.visualstudio.com/). Use an entry from the "Run And Debug" pane to test your code.
+
+Make sure to follow the [Vintage Story modding guide](https://wiki.vintagestory.at/Modding:Preparing_For_Code_Mods) to make sure the proper .NET SDK is installed and your `$VINTAGE_STORY` environment variable is set up.
