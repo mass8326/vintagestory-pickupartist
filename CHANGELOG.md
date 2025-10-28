@@ -1,5 +1,11 @@
 # PickupArtist
 
+## Unreleased
+
+- Fix NullReferenceException for BlockEntityGroundStorage.StorageProps
+- Update target game version to 1.21.5
+  - Mod still needs to be updated for new MaxStackingHeight logic
+
 ## 0.3.1
 
 - Fix ingot piles not properly stacking

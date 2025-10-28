@@ -90,11 +90,31 @@ public static class PickupArtistUtil {
   public static bool IsMergable(IWorldAccessor world, ItemSlot slot, ItemStack stack) =>
     slot.Itemstack?.Equals(world, stack, GlobalConstants.IgnoredStackAttributes) == true;
 
+  public static InventoryGeneric? GetInventory(this BlockEntityGroundStorage instance) {
+    return instance.GetField<InventoryGeneric>("inventory");
+  }
+  public static ItemSlot? GetStorageSlot(this BlockEntityGroundStorage instance) {
+    InventoryGeneric? inventory = instance.GetInventory();
+    return inventory?.FirstNonEmptySlot ?? inventory?[0];
+  }
+
+  public static GroundStorageProperties? GetStoragePropsWithWarning(this BlockEntityGroundStorage instance, ILogger logger) {
+    GroundStorageProperties? props = instance.StorageProps;
+    if (props == null) {
+      string? code = instance.GetStorageSlot()?.Itemstack?.Collectible?.Code?.ToShortString();
+      logger.PickupWarning($"Cannot determine StorageProps for BlockEntityGroundStorage containing '{code}'! Functionality may be degraded.");
+    }
+    return props;
+  }
+
+  public static void PickupWarning(this ILogger logger, string msg) =>
+    logger.Warning("[PickupArtist:Warning] " + msg);
+
   [Conditional("DEBUG")]
   public static void PickupDebug(this ILogger logger, string msg) =>
-    logger.Debug("[PickupArtist] " + msg);
+    logger.Debug("[PickupArtist:Debug] " + msg);
 
   [Conditional("DEBUG")]
   public static void PickupDebug(this ILogger logger, string format, params object?[] args) =>
-    logger.Debug("[PickupArtist] " + format, args);
+    logger.Debug("[PickupArtist:Debug] " + format, args);
 }

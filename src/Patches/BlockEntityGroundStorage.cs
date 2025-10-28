@@ -53,13 +53,15 @@ public static class BlockEntityGroundStorage_putOrGetItemStacking_Patch {
     BlockPos pilePos = __instance.Pos;
     BlockPos abovePos = pilePos.UpCopy();
     BlockEntity aboveEntity = __instance.Api.World.BlockAccessor.GetBlockEntity(abovePos);
-    if (
-      aboveEntity is BlockEntityGroundStorage aboveEntityGroundStorage &&
-      aboveEntityGroundStorage.StorageProps.Layout == EnumGroundStorageLayout.Stacking
-    ) {
-      world.Logger.PickupDebug("Forwarding pile interaction start to pile above");
-      __result = aboveEntityGroundStorage.OnPlayerInteractStart(byPlayer, bs);
-      return false;
+
+    if (aboveEntity is BlockEntityGroundStorage aboveEntityGroundStorage) {
+      GroundStorageProperties? aboveProps = aboveEntityGroundStorage.GetStoragePropsWithWarning(world.Logger);
+      // TODO: Implement logic for MaxStackingHeight
+      if (aboveProps?.Layout == EnumGroundStorageLayout.Stacking) {
+        world.Logger.PickupDebug("Forwarding pile interaction start to pile above");
+        __result = aboveEntityGroundStorage.OnPlayerInteractStart(byPlayer, bs);
+        return false;
+      }
     }
 
     bool sneaking = byPlayer.Entity.Controls.ShiftKey;
@@ -130,7 +132,7 @@ public static class BlockEntityGroundStorage_TryPutItem_Patch {
 
     IWorldAccessor world = __instance.Api.World;
     BlockPos pos = __instance.Pos;
-    ItemSlot? storageSlot = __instance.GetField<InventoryGeneric>("inventory")?[0];
+    ItemSlot? storageSlot = __instance.GetStorageSlot();
     if (storageSlot == null) {
       __instance.Api.World.Logger.PickupDebug("Ignoring TryPutItem due to indeterminable storage slot");
       return true;
@@ -162,8 +164,8 @@ public static class BlockEntityGroundStorage_TryPutItem_Patch {
     }
     sourceSlot.TakeOut(addQty);
     sourceSlot.OnItemSlotModified(null);
-    AssetLocation sound = __instance.StorageProps.PlaceRemoveSound.WithPathPrefixOnce("sounds/");
-    world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
+    AssetLocation? sound = __instance.StorageProps?.PlaceRemoveSound?.WithPathPrefixOnce("sounds/");
+    if (sound != null) world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
 
     __instance.MarkDirty();
 
@@ -180,23 +182,25 @@ public static class BlockEntityGroundStorage_TryPutItem_Patch {
 [HarmonyPatch(typeof(BlockEntityGroundStorage), nameof(BlockEntityGroundStorage.TryTakeItem))]
 public static class BlockEntityGroundStorage_TryTakeItem_Patch {
   public static bool Prefix(BlockEntityGroundStorage __instance, ref bool __result, IPlayer player) {
-    if (__instance.StorageProps?.Layout != EnumGroundStorageLayout.Stacking) return true;
+    var world = __instance.Api.World;
+    GroundStorageProperties? props = __instance.GetStoragePropsWithWarning(world.Logger);
+    if (props?.Layout != EnumGroundStorageLayout.Stacking) return true;
 
-    ItemSlot? storageSlot = __instance.GetField<InventoryGeneric>("inventory")?[0];
+    ItemSlot? storageSlot = __instance.GetStorageSlot();
     if (storageSlot?.Empty != false) return true;
 
     bool sprinting = player.Entity.Controls.CtrlKey;
     int transfer = sprinting ? __instance.BulkTransferQuantity : __instance.TransferQuantity;
     int quantity = GameMath.Min(transfer, __instance.TotalStackSize);
 
-    var world = __instance.Api.World;
     var pos = __instance.Pos;
     ItemStack stack = storageSlot.TakeOut(quantity);
     PickupArtistUtil.GiveToPlayer(world, player, pos, stack);
 
     if (__instance.TotalStackSize == 0) __instance.Api.World.BlockAccessor.SetBlock(0, pos);
 
-    world.PlaySoundAt(__instance.StorageProps.PlaceRemoveSound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
+    AssetLocation? sound = props?.PlaceRemoveSound;
+    if (sound != null) world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
 
     __instance.MarkDirty();
 
@@ -218,6 +222,8 @@ public static class BlockEntityGroundStorage_putOrGetItemSingle_Patch {
       return true;
     }
 
+    // Forward interactions for contained interactables
+    // e.g. removing food from a crock with a bowl
     if (ourSlot.Itemstack.Collectible is IContainedInteractable containedInteractable && containedInteractable.OnContainedInteractStart(__instance, ourSlot, player, bs)) {
       world.Logger.PickupDebug("Contained interactable handled put/get item single");
       BlockGroundStorage.IsUsingContainedBlock = true;
@@ -227,7 +233,8 @@ public static class BlockEntityGroundStorage_putOrGetItemSingle_Patch {
     }
 
     PickupArtistUtil.GiveToPlayer(world, player, pos, ourSlot.Itemstack);
-    world.PlaySoundAt(__instance.StorageProps.PlaceRemoveSound, pos.X + 0.5, pos.InternalY, pos.Z + 0.5, player, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16f);
+    AssetLocation? sound = __instance.StorageProps?.PlaceRemoveSound;
+    if (sound != null) world.PlaySoundAt(sound, pos.X + 0.5, pos.InternalY, pos.Z + 0.5, player, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16f);
     ourSlot.Itemstack = null;
     ourSlot.MarkDirty();
     __result = true;
