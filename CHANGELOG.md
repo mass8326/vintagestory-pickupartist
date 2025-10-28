@@ -1,9 +1,10 @@
 # PickupArtist
 
-## 0.3.2
+## Unreleased
 
-- Update mod to support game version 1.21.5
-- Fix NullReferenceException when playing sounds for ground storage piles
+- Fix NullReferenceException for BlockEntityGroundStorage.StorageProps
+- Update target game version to 1.21.5
+  - Mod still needs to be updated for new MaxStackingHeight logic
 
 ## 0.3.1
 

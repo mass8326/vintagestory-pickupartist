@@ -4,7 +4,7 @@
 		<TargetGameVersion>1.21.5</TargetGameVersion>
 		<LangVersion>11</LangVersion>
 		<VSPath>$(VINTAGE_STORY)</VSPath>
-		<ModVersion>0.3.2</ModVersion>
+		<ModVersion>0.3.1</ModVersion>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
