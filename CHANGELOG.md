@@ -1,6 +1,6 @@
 # PickupArtist
 
-## Unreleased
+## 0.4.0-pre.1
 
 - Fix NullReferenceException for BlockEntityGroundStorage.StorageProps
 - Update target game version to 1.21.5
