@@ -1,6 +1,6 @@
 # PickupArtist Changelog
 
-## Unreleased
+## 0.4.0-pre.2
 
 - Fix duplicated sounds and flashing models (https://github.com/mass8326/vintagestory-pickupartist/issues/8)
 
