@@ -33,7 +33,6 @@ public static class BlockEntityGroundStorage_OnPlayerInteractStart_Patch {
 
     __instance.Api.World.Logger.PickupDebug("Modifying pile interaction start at {0}", pos);
     bool success = __instance.CallMethod<bool>("putOrGetItemStacking", new object[] { player, bs });
-    if (success) __instance.MarkDirty(true);
 
     InventoryGeneric? inventory = __instance.GetField<InventoryGeneric>("inventory");
     if (inventory?.Empty != false) {
@@ -165,7 +164,7 @@ public static class BlockEntityGroundStorage_TryPutItem_Patch {
     sourceSlot.TakeOut(addQty);
     sourceSlot.OnItemSlotModified(null);
     AssetLocation? sound = __instance.StorageProps?.PlaceRemoveSound?.WithPathPrefixOnce("sounds/");
-    if (sound != null) world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
+    if (sound != null && world.Side == EnumAppSide.Server) world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
 
     __instance.MarkDirty();
 
@@ -200,7 +199,7 @@ public static class BlockEntityGroundStorage_TryTakeItem_Patch {
     if (__instance.TotalStackSize == 0) __instance.Api.World.BlockAccessor.SetBlock(0, pos);
 
     AssetLocation? sound = props?.PlaceRemoveSound;
-    if (sound != null) world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
+    if (sound != null && world.Side == EnumAppSide.Server) world.PlaySoundAt(sound, pos.X + 0.5, pos.Y, pos.Z + 0.5, null, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16);
 
     __instance.MarkDirty();
 
@@ -234,7 +233,7 @@ public static class BlockEntityGroundStorage_putOrGetItemSingle_Patch {
 
     PickupArtistUtil.GiveToPlayer(world, player, pos, ourSlot.Itemstack);
     AssetLocation? sound = __instance.StorageProps?.PlaceRemoveSound;
-    if (sound != null) world.PlaySoundAt(sound, pos.X + 0.5, pos.InternalY, pos.Z + 0.5, player, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16f);
+    if (sound != null && world.Side == EnumAppSide.Server) world.PlaySoundAt(sound, pos.X + 0.5, pos.InternalY, pos.Z + 0.5, player, 0.88f + (float)world.Rand.NextDouble() * 0.24f, 16f);
     ourSlot.Itemstack = null;
     ourSlot.MarkDirty();
     __result = true;

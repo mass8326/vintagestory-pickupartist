@@ -60,6 +60,7 @@ Don't have control of the server? Want even more convenience when it comes to ma
 
 Thank you to everyone who helps make this mod worth the time and effort!
 
+- [DeadSigma](https://github.com/DeadSigma) - for [contributing code](https://github.com/mass8326/vintagestory-pickupartist/issues/8) that fixed duplicated sounds and flashing models
 - [SparksSkywere](https://github.com/SparksSkywere) - for [contributing code](https://github.com/mass8326/vintagestory-pickupartist/pull/7) that fixed some NullReferenceExceptions
 - [DanaCraluminum](https://github.com/Craluminum2413) - for providing code from their [ExtraInfo](https://github.com/Craluminum-Mods/ExtraInfo) mod under an open source license
 - [SalieriC](https://github.com/SalieriC) - for giving me the [gentle nudge](https://github.com/mass8326/vintagestory-nohands/issues/1) to make this mod

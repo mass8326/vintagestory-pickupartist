@@ -1,8 +1,12 @@
-# PickupArtist
+# PickupArtist Changelog
+
+## Unreleased
+
+- Fix duplicated sounds and flashing models (https://github.com/mass8326/vintagestory-pickupartist/issues/8)
 
 ## 0.4.0-pre.1
 
-- Fix NullReferenceException for BlockEntityGroundStorage.StorageProps
+- Fix NullReferenceException for BlockEntityGroundStorage.StorageProps (https://github.com/mass8326/vintagestory-pickupartist/pull/7)
 - Update target game version to 1.21.5
   - Mod still needs to be updated for new MaxStackingHeight logic
 
